@@ -7,7 +7,7 @@ This project is a **full-stack web application** built with **Next.js**, **React
 - **Next.js** – Server-side rendering and API routes for a seamless experience.  
 - **React & TypeScript** – Strongly typed, scalable, and efficient front-end development.  
 - **Tailwind CSS** – Rapid UI development with utility-first CSS.  
-- **Supabase** – Database, authentication, and storage for a backend-free setup.  
+- **Firebase** – Database, authentication, and storage for a backend-free setup.  
 - **OpenRouter AI** – AI-powered wireframe-to-code generation.  
 
 ## 📦 Tech Stack  
