@@ -15,15 +15,14 @@ function Provider({
 }>) {
   const [user, setUser] = useState<User | null>(null);
 
-  /*
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-        });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
 
-        return () => unsubscribe(); // Cleanup
-    }, []);
-*/
+    return () => unsubscribe(); // Cleanup
+  }, []);
+
   return (
     <AuthContext.Provider value={{ user }}>
       <div>{children}</div>
