@@ -13,6 +13,9 @@ import Image from "next/image";
 import React, { ChangeEvent, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "@/configs/firebaseConfig";
+import uuid4 from "uuid4";
+import axios from "axios";
+import { useAuthContext } from "@/app/provider";
 
 function ImageUpload() {
   const AiModelList = [
@@ -34,6 +37,9 @@ function ImageUpload() {
   const [file, setFile] = useState<any>();
   const [model, setModel] = useState<string>();
   const [description, setDescription] = useState<string>();
+
+  const { user } = useAuthContext();
+
   const OnChangeSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -60,7 +66,17 @@ function ImageUpload() {
       const imageUrl = await getDownloadURL(imageRef);
       console.log("Bildens URL:", imageUrl);
 
-      return imageUrl; // Returnerar URL:en om du behöver den
+      const uid = uuid4();
+
+      const result = await axios.post("/api/wireframe", {
+        uid: uid,
+        description: description,
+        imageUrl: imageUrl,
+        model: model,
+        email: user?.email,
+      });
+
+      console.log(result.data);
     } catch (err) {
       console.error("Fel vid uppladdning:", err);
     }
