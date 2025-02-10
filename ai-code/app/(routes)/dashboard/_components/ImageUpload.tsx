@@ -11,12 +11,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { CloudUpload, WandSparkles, X } from "lucide-react";
 import Image from "next/image";
 import React, { ChangeEvent, useState } from "react";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "@/configs/firebaseConfig";
 
 function ImageUpload() {
   const AiModelList = [
     {
       name: "Gemini Google",
-      icon: "/google.png",
+      icon: "/gemini.png",
     },
     {
       name: "LLama by Meta",
@@ -29,12 +31,38 @@ function ImageUpload() {
   ];
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const onChangeSelect = (event: ChangeEvent<HTMLInputElement>) => {
+  const [file, setFile] = useState<any>();
+  const [model, setModel] = useState<string>();
+  const [description, setDescription] = useState<string>();
+  const OnChangeSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
       console.log(files[0]);
       const imageUrl = URL.createObjectURL(files[0]);
+      setFile(files[0]);
       setPreviewUrl(imageUrl);
+    }
+  };
+
+  const OnConvertToCodeButtonClick = async () => {
+    if (!file || !model || !description) {
+      console.error("Ingen fil vald!");
+      return;
+    }
+
+    const fileName = `${Date.now()}.png`;
+    const imageRef = ref(storage, `ai-wireframe/${fileName}`);
+
+    try {
+      const uploadResponse = await uploadBytes(imageRef, file);
+      console.log("Uppladdning lyckades:", uploadResponse);
+
+      const imageUrl = await getDownloadURL(imageRef);
+      console.log("Bildens URL:", imageUrl);
+
+      return imageUrl; // Returnerar URL:en om du behöver den
+    } catch (err) {
+      console.error("Fel vid uppladdning:", err);
     }
   };
   return (
@@ -56,7 +84,7 @@ function ImageUpload() {
               type="file"
               id="imageSelect"
               className="hidden"
-              onChange={onChangeSelect}
+              onChange={OnChangeSelect}
               multiple={false}
             />
           </div>
@@ -78,15 +106,15 @@ function ImageUpload() {
 
         <div className="p-7 border shadow-md rounded-md">
           <h2 className="font-bold text-lg ">Select Ai model</h2>
-          <Select>
+          <Select onValueChange={(value) => setModel(value)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Ai model" />
             </SelectTrigger>
             <SelectContent>
               {AiModelList.map((model, index) => (
-                <SelectItem value={model.name}>
-                  <div key={index} className="flex items-center gap-2">
-                    <Image src={model.icon} alt="icon" width={25} height={25} />
+                <SelectItem value={model.name} key={index}>
+                  <div className="flex items-center gap-2">
+                    <Image src={model.icon} alt="icon" width={20} height={30} />
                     <h2>{model.name}</h2>
                   </div>
                 </SelectItem>
@@ -97,13 +125,14 @@ function ImageUpload() {
             Enter Description about your webpage
           </h2>
           <Textarea
+            onChange={(event) => setDescription(event.target.value)}
             className="mt-3 h-[200px]"
             placeholder="Write about your webpage"
           />
         </div>
       </div>
       <div className="mt-10 flex justify-center items-center">
-        <Button>
+        <Button onClick={OnConvertToCodeButtonClick}>
           <WandSparkles className="" />
           Convert to Code
         </Button>
