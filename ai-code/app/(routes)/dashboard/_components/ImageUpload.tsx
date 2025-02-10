@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { CloudUpload, WandSparkles, X } from "lucide-react";
+import { CloudUpload, Loader2Icon, WandSparkles, X } from "lucide-react";
 import Image from "next/image";
 import React, { ChangeEvent, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
@@ -16,20 +16,26 @@ import { storage } from "@/configs/firebaseConfig";
 import uuid4 from "uuid4";
 import axios from "axios";
 import { useAuthContext } from "@/app/provider";
+import { useRouter } from "next/navigation";
+import Constants from "@/data/Constants";
 
 function ImageUpload() {
+  const route = useRouter();
   const AiModelList = [
     {
       name: "Gemini Google",
       icon: "/gemini.png",
+      modelName: "google/gemini-2.0-pro-exp-02-05:free",
     },
     {
       name: "LLama by Meta",
       icon: "/meta.png",
+      modelName: "meta-llama/llama-3.3-70b-instruct:free",
     },
     {
       name: "Deepseek",
       icon: "/deepseek.png",
+      modelName: "deepseek/deepseek-r1-distill-llama-70b:free",
     },
   ];
 
@@ -37,6 +43,7 @@ function ImageUpload() {
   const [file, setFile] = useState<any>();
   const [model, setModel] = useState<string>();
   const [description, setDescription] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { user } = useAuthContext();
 
@@ -52,9 +59,18 @@ function ImageUpload() {
 
   const OnConvertToCodeButtonClick = async () => {
     if (!file || !model || !description) {
-      console.error("Ingen fil vald!");
+      if (!file) {
+        console.error("Ingen fil vald!");
+      }
+      if (!model) {
+        console.error("Ingen modell vald!");
+      }
+      if (!description) {
+        console.error("Ingen beskrivning angiven!");
+      }
       return;
     }
+    setLoading(true);
 
     const fileName = `${Date.now()}.png`;
     const imageRef = ref(storage, `ai-wireframe/${fileName}`);
@@ -76,7 +92,9 @@ function ImageUpload() {
         email: user?.email,
       });
 
-      console.log(result.data);
+      setLoading(false);
+
+      route.push(`/view-code/${uid}`);
     } catch (err) {
       console.error("Fel vid uppladdning:", err);
     }
@@ -127,7 +145,7 @@ function ImageUpload() {
               <SelectValue placeholder="Ai model" />
             </SelectTrigger>
             <SelectContent>
-              {AiModelList.map((model, index) => (
+              {Constants?.AiModelList.map((model, index) => (
                 <SelectItem value={model.name} key={index}>
                   <div className="flex items-center gap-2">
                     <Image src={model.icon} alt="icon" width={20} height={30} />
@@ -148,8 +166,12 @@ function ImageUpload() {
         </div>
       </div>
       <div className="mt-10 flex justify-center items-center">
-        <Button onClick={OnConvertToCodeButtonClick}>
-          <WandSparkles className="" />
+        <Button onClick={OnConvertToCodeButtonClick} disabled={loading}>
+          {loading ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            <WandSparkles className="" />
+          )}
           Convert to Code
         </Button>
       </div>

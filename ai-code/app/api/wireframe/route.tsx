@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+
 import { db } from "@/configs/db";
-import { usersTable, WireFrameTable } from "@/configs/schema";
+import { WireFrameTable } from "@/configs/schema";
+import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   const { description, imageUrl, model, uid, email } = await req.json();
@@ -20,6 +21,22 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(result);
 }
 
-// } catch (e) {
-//     return NextResponse.json(e)
-// }
+export async function GET(req: NextResponse) {
+  try {
+    const reqUrl = req.url;
+    const { searchParams } = new URL(reqUrl);
+    const uid = searchParams?.get("uid");
+
+    if (uid) {
+      const result = await db
+        .select()
+        .from(WireFrameTable)
+        .where(eq(WireFrameTable.uid, uid));
+
+      return NextResponse.json(result[0]);
+    }
+    return NextResponse.json({ result: "No Record found" });
+  } catch (err) {
+    console.log(err);
+  }
+}
