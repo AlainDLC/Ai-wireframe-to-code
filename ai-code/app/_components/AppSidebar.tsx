@@ -45,13 +45,14 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="p-4">
           <Image
-            src={"./logo.svg"}
+            src="/DLCLOGA.png"
             alt="logo"
             width={100}
             height={100}
-            className="w-full h-full"
+            layout="intrinsic"
+            quality={100}
+            className="w-[80px] h-[80px] rounded-md"
           />
-          <h2 className="text-sm text-gray-400 text-center">Build Awesome</h2>
         </div>
       </SidebarHeader>
       <SidebarContent>
