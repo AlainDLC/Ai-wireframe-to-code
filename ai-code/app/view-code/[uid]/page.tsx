@@ -1,12 +1,15 @@
 "use client";
 
+import AppHeader from "@/app/_components/AppHeader";
 import Constants from "@/data/Constants";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import SelectionDetail from "../_components/SelectionDetail";
+import CodeEditor from "../_components/CodeEditor";
 
-interface RECORD {
+export interface RECORD {
   id: number;
   description: string;
   code: any;
@@ -18,6 +21,7 @@ function ViewCode() {
   const { uid } = useParams();
   const [loading, setLoading] = useState<boolean>(false);
   const [codeResp, setCodeResp] = useState<string>("");
+  const [record, setRecord] = useState<RECORD>();
   useEffect(() => {
     if (uid) {
       GetRecordInfo();
@@ -30,8 +34,9 @@ function ViewCode() {
       const result = await axios.get(`/api/wireframe?uid=${uid}`);
       const resp = result?.data;
 
+      setRecord(result?.data);
       if (resp?.code == null) {
-        GenerateCode(resp);
+        //      GenerateCode(resp);
       }
 
       if (resp?.err) {
@@ -91,8 +96,15 @@ function ViewCode() {
 
   return (
     <div>
-      {loading && <LoaderCircle className="animate-spin" />}Viewcode
-      <p>{codeResp}</p>
+      <AppHeader hideSidebar={true} />
+      <div className="grid grid-cols-1 md:grid-cols-5 p-5 gap-10">
+        <div>
+          <SelectionDetail record={record} />
+        </div>
+        <div className="col-span-4">
+          <CodeEditor />
+        </div>
+      </div>
     </div>
   );
 }
