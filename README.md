@@ -15,7 +15,7 @@ This project is a **full-stack web application** built with **Next.js**, **React
 - **Framework:** Next.js (React)  
 - **Styling:** Tailwind CSS  
 - **Language:** TypeScript  
-- **Database:** Supabase  
+- **Database:** Drizzle Neon Orm  
 - **AI Integration:** OpenRouter AI  
 
 
