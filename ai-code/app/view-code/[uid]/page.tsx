@@ -1,5 +1,6 @@
 "use client";
 
+import Constants from "@/data/Constants";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
 import { useParams } from "next/navigation";
@@ -15,8 +16,8 @@ interface RECORD {
 
 function ViewCode() {
   const { uid } = useParams();
-  const [loading, setLoading] = useState<boolean>(false); // Rättat stavfel från 'loding' till 'loading'
-
+  const [loading, setLoading] = useState<boolean>(false);
+  const [codeResp, setCodeResp] = useState<string>("");
   useEffect(() => {
     if (uid) {
       GetRecordInfo();
@@ -40,7 +41,7 @@ function ViewCode() {
       setLoading(false);
     } catch (err) {
       console.error("Fel vid hämtning av data:", err);
-      setLoading(false); // Säkerställ att loading sätts till false även vid fel
+      setLoading(false);
     }
   };
 
@@ -51,7 +52,7 @@ function ViewCode() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          description: record?.description,
+          description: record?.description + ":" + Constants.PROMT,
           model: record?.model,
           imageUrl: record?.imageUrl,
         }),
@@ -62,7 +63,7 @@ function ViewCode() {
       }
 
       if (!res.body) {
-        console.error("Ingen kropp i svaret från API");
+        console.error("API resp");
         setLoading(false);
         return;
       }
@@ -73,18 +74,26 @@ function ViewCode() {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const text = decoder.decode(value);
-        console.log(text); // Här kan du också uppdatera UI:t med den inkommande datan om du vill
+        const text = decoder
+          .decode(value)
+          .replace("```typescript", "")
+          .replace("```", "");
+        setCodeResp((prev) => prev + text);
+        console.log(text);
       }
+      setLoading(false);
     } catch (err) {
       console.error("Fel vid generering av kod:", err);
     } finally {
-      setLoading(false); // Säkerställ att loading sätts till false när processen är klar
+      setLoading(false);
     }
   };
 
   return (
-    <div>{loading && <LoaderCircle className="animate-spin" />}Viwcode</div>
+    <div>
+      {loading && <LoaderCircle className="animate-spin" />}Viewcode
+      <p>{codeResp}</p>
+    </div>
   );
 }
 

@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
   console.log("Using model:", modelName);
 
   try {
-    // Gör OpenAI-anropet för att få en streamande svar
     const response = await openAi.chat.completions.create({
       model: modelName ?? "google/gemini-2.0-pro-exp-02-05:free",
       stream: true,
