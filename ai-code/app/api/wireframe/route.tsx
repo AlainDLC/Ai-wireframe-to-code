@@ -37,6 +37,23 @@ export async function GET(req: NextResponse) {
     }
     return NextResponse.json({ result: "No Record found" });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+  }
+}
+
+export async function PUT(req: NextResponse) {
+  try {
+    const { uid, codeResp } = await req.json();
+
+    const result = await db
+      .update(WireFrameTable)
+      .set({
+        code: codeResp,
+      })
+      .where(eq(WireFrameTable.uid, uid))
+      .returning({ uid: WireFrameTable.uid });
+    return NextResponse.json(result);
+  } catch (err) {
+    console.error("mishmatch", err);
   }
 }
