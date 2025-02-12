@@ -3,12 +3,10 @@ import {
   Sandpack,
   SandpackCodeEditor,
   SandpackLayout,
-  SandpackPreview,
   SandpackProvider,
 } from "@codesandbox/sandpack-react";
 import { nightOwl } from "@codesandbox/sandpack-themes";
 
-// Här definieras typerna mer exakt, förtydligar att codeResp är en string och isReady är en boolean
 interface CodeEditorProps {
   codeResp: string;
   isReady: boolean;

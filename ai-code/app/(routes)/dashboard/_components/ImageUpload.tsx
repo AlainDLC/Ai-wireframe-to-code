@@ -15,7 +15,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "@/configs/firebaseConfig";
 import uuid4 from "uuid4";
 import axios from "axios";
-import { useAuthContext } from "@/app/provider";
+
 import { useRouter } from "next/navigation";
 import Constants from "@/data/Constants";
 
@@ -44,8 +44,6 @@ function ImageUpload() {
   const [model, setModel] = useState<string>();
   const [description, setDescription] = useState<string>();
   const [loading, setLoading] = useState<boolean>(false);
-
-  const { user } = useAuthContext();
 
   const OnChangeSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -89,7 +87,6 @@ function ImageUpload() {
         description: description,
         imageUrl: imageUrl,
         model: model,
-        email: user?.email,
       });
 
       setLoading(false);
@@ -106,11 +103,11 @@ function ImageUpload() {
           <div className="p-7 border border-dashed rounded-md shadow-sm flex flex-col items-center justify-center">
             <CloudUpload className="h-10 w-10 text-primary" />
             <h2 className="font-bold text-lg">Upload Image</h2>
-            <p className="text-slate-500">Click button to select Wireframe</p>
+
             <div className="p-5 flex justify-center">
               <label htmlFor="imageSelect">
                 <h2 className="p-2 bg-primary text-white rounded-md px-5">
-                  Select Image
+                  Select Wireframe
                 </h2>
               </label>
             </div>
@@ -139,7 +136,7 @@ function ImageUpload() {
         )}
 
         <div className="p-7 border shadow-md rounded-md">
-          <h2 className="font-bold text-lg ">Select Ai model</h2>
+          <h2 className="font-bold text-lg text-primary ">Select Ai model</h2>
           <Select onValueChange={(value) => setModel(value)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Ai model" />
@@ -155,17 +152,15 @@ function ImageUpload() {
               ))}
             </SelectContent>
           </Select>
-          <h2 className="font-bold text-lg mt-7">
-            Enter Description about your webpage
-          </h2>
+          <h2 className="font-bold text-lg mt-7 text-primary">Description</h2>
           <Textarea
             onChange={(event) => setDescription(event.target.value)}
             className="mt-3 h-[200px]"
-            placeholder="Write about your webpage"
+            placeholder="Description about wireframe"
           />
         </div>
       </div>
-      <div className="mt-10 flex justify-center items-center">
+      <div className="mt-10 flex items-start">
         <Button onClick={OnConvertToCodeButtonClick} disabled={loading}>
           {loading ? (
             <Loader2Icon className="animate-spin" />
